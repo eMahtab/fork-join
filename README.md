@@ -10,3 +10,10 @@ Then, the subtasks are processed independently and if they return a result, all 
 
 
 ![Fork Join](fork-join.gif?raw=true)
+
+
+
+
+# References :
+https://www.pluralsight.com/guides/introduction-to-the-fork-join-framework
+
