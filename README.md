@@ -12,6 +12,16 @@ Then, the subtasks are processed independently and if they return a result, all 
 ![Fork Join](fork-join.gif?raw=true)
 
 
+To execute the tasks in parallel, the framework uses a pool of threads, with a number of threads equal to the number of processors available to the Java Virtual Machine (JVM) by default.
+
+Each thread has its own double-ended queue (deque) to store the tasks that will execute.
+
+A deque is a type of queue that supports adding or removing elements from either the front (head) or the back (tail). This allows two things:
+
+A thread can execute only one task at a time (the task at the head of its deque).
+A work-stealing algorithm s implemented to balance the thread’s workload.
+With the work-stealing algorithm, threads that run out of tasks to process can steal tasks from other threads that are still busy (by removing tasks from the tail of their deque).
+
 
 
 # References :
