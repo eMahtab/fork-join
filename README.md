@@ -9,4 +9,4 @@ Applying a divide and conquer principle, the framework recursively divides the t
 Then, the subtasks are processed independently and if they return a result, all the results are recursively combined into a single result. This is the join part.
 
 
-
+![Fork Join](fork-join.gif?raw=true)
