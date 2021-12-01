@@ -86,9 +86,93 @@ public class Main {
 Summation 7998000
 ```
 
+## RecursiveAction :
+```java
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveAction;
+  
+// A task that transforms the elements into their square roots
+class SqrtTransform extends RecursiveAction {
+    final int seqThreshold = 1000;
+  
+    double[] data;
+  
+    // Determines what part of data to process
+    int start, end;
+  
+    SqrtTransform(double[] data, int start, int end)
+    {
+        this.data = data;
+        this.start = start;
+        this.end = end;
+    }
+  
+    // The method where parallel computation will occur
+    @Override
+    protected void compute()
+    {
+        // If the number of elements are less
+        // than the sequential threshold
+        if ((end - start) < seqThreshold) {
+            for (int i = start; i < end; i++) {
+                data[i] = Math.sqrt(data[i]);
+            }
+        }
+        else {
+            // Otherwise, continue to break the data into smaller pieces
+            // Find the midpoint
+            int middle = (start + end) / 2;
+  
+            // Invoke new tasks, using the subdivided tasks.
+            invokeAll(new SqrtTransform(data, start, middle),
+                      new SqrtTransform(data, middle, end));
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args)
+    {
+        // Create a pool of threads.
+        ForkJoinPool forkJoinPool = new ForkJoinPool();
+        double[] nums = new double[100000];
+  
+        // Give nums some values
+        for (int i = 0; i < nums.length; i++) {
+            nums[i] = (double)i;
+        }
+        System.out.println("A portion of the original sequence");
+        for (int i = 0; i < 9; i++) {
+            System.out.print(nums[i] + " ");
+        }
+        System.out.println();
+        SqrtTransform task
+            = new SqrtTransform(nums, 0, nums.length);
+  
+        // Start the task
+        forkJoinPool.invoke(task);
+        System.out.println("A portion of the transformed sequence"
+                           + " (to four decimal places): ");
+        for (int i = 0; i < 9; i++) {
+            System.out.printf("%.4f ", nums[i]);
+        }
+        System.out.println();
+    }
+}
+  
+```
+
+## Output :
+```
+A portion of the original sequence
+0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 
+A portion of the transformed sequence (to four decimal places): 
+0.0000 1.0000 1.4142 1.7321 2.0000 2.2361 2.4495 2.6458 2.8284 
+```
 
 # References :
 1. https://www.pluralsight.com/guides/introduction-to-the-fork-join-framework
 
 2. https://www.geeksforgeeks.org/java-util-concurrent-recursivetask-class-in-java-with-examples
 
+3. https://www.geeksforgeeks.org/java-util-concurrent-recursiveaction-class-in-java-with-examples
