@@ -14,6 +14,8 @@ Then, the subtasks are processed independently and if they return a result, all 
 
 To execute the tasks in parallel, the framework uses a pool of threads, with a number of threads equal to the number of processors available to the Java Virtual Machine (JVM) by default.
 
+**💥💥💥 Note :**
+
 Each thread has its own double-ended queue (deque) to store the tasks that will execute.
 
 A deque is a type of queue that supports adding or removing elements from either the front (head) or the back (tail). This allows two things:
