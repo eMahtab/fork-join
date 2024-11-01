@@ -152,6 +152,6 @@ Main method execution finished
 # References :
 1. https://www.pluralsight.com/guides/introduction-to-the-fork-join-framework
 
-2. https://www.geeksforgeeks.org/java-util-concurrent-recursivetask-class-in-java-with-examples
+2. https://www.youtube.com/watch?v=aiwuJQt7YJU
 
-3. https://www.geeksforgeeks.org/java-util-concurrent-recursiveaction-class-in-java-with-examples
+3. https://github.com/jjenkov/java-examples/blob/main/src/main/java/com/jenkov/java/concurrency/forkjoinpool/JavaForkJoinPoolExample.java
