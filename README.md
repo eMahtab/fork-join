@@ -76,7 +76,23 @@ public class Main {
 
 ### Output :
 ```
-Summation 7998000
+Splitting workLoad : 123
+Splitting workLoad : 61
+Splitting workLoad : 62
+Splitting workLoad : 30
+Splitting workLoad : 31
+Splitting workLoad : 31
+Doing workLoad myself: 15
+Doing workLoad myself: 16
+Splitting workLoad : 31
+Doing workLoad myself: 15
+Doing workLoad myself: 15
+Doing workLoad myself: 16
+Doing workLoad myself: 16
+Doing workLoad myself: 15
+Doing workLoad myself: 15
+Result :123
+Main method execution finished
 ```
 
 ## RecursiveAction :
