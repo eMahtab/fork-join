@@ -25,7 +25,7 @@ A work-stealing algorithm is implemented to balance the thread’s workload.
 With the work-stealing algorithm, threads that run out of tasks to process can steal tasks from other threads that are still busy (by removing tasks from the tail of their deque).
 
 
-## RecursiveTask
+## RecursiveTask : returns result, have both fork and join part
 ```java
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
@@ -95,7 +95,7 @@ Result :123
 Main method execution finished
 ```
 
-## RecursiveAction :
+## RecursiveAction : doesn't return any result, have only fork part
 ```java
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
