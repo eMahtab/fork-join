@@ -90,84 +90,63 @@ Summation 7998000
 ```java
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
-  
-// A task that transforms the elements into their square roots
-class SqrtTransform extends RecursiveAction {
-    final int seqThreshold = 1000;
-  
-    double[] data;
-  
-    // Determines what part of data to process
-    int start, end;
-  
-    SqrtTransform(double[] data, int start, int end)
-    {
-        this.data = data;
-        this.start = start;
-        this.end = end;
+
+class MyRecursiveAction extends RecursiveAction {
+    private long workLoad = 0;
+    public MyRecursiveAction(long workLoad) {
+        this.workLoad = workLoad;
     }
-  
-    // The method where parallel computation will occur
+
     @Override
-    protected void compute()
-    {
-        // If the number of elements are less
-        // than the sequential threshold
-        if ((end - start) < seqThreshold) {
-            for (int i = start; i < end; i++) {
-                data[i] = Math.sqrt(data[i]);
-            }
-        }
-        else {
-            // Otherwise, continue to break the data into smaller pieces
-            // Find the midpoint
-            int middle = (start + end) / 2;
-  
-            // Invoke new tasks, using the subdivided tasks.
-            invokeAll(new SqrtTransform(data, start, middle),
-                      new SqrtTransform(data, middle, end));
+    protected void compute() {
+        // if work is above threshold, break tasks up into smaller tasks
+        if (this.workLoad > 16) {
+            System.out.println("Splitting workLoad : " + this.workLoad);
+            long workload1 = this.workLoad / 2;
+            long workload2 = this.workLoad - workload1;
+            MyRecursiveAction subtask1 = new MyRecursiveAction(workload1);
+            MyRecursiveAction subtask2 = new MyRecursiveAction(workload2);
+            subtask1.fork();
+            subtask2.fork();
+        } else {
+            System.out.println("Doing workLoad myself: " + this.workLoad);
         }
     }
 }
 
 public class Main {
-    public static void main(String[] args)
-    {
-        // Create a pool of threads.
-        ForkJoinPool forkJoinPool = new ForkJoinPool();
-        double[] nums = new double[100000];
-  
-        // Give nums some values
-        for (int i = 0; i < nums.length; i++) {
-            nums[i] = (double)i;
+    public static void main(String[] args) {
+        ForkJoinPool forkJoinPool = new ForkJoinPool(8);
+        MyRecursiveAction myRecursiveAction = new MyRecursiveAction(123);
+        forkJoinPool.invoke(myRecursiveAction);
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException exception) {
+            System.out.println("Main thread interrupted");
         }
-        System.out.println("A portion of the original sequence");
-        for (int i = 0; i < 9; i++) {
-            System.out.print(nums[i] + " ");
-        }
-        System.out.println();
-        SqrtTransform task
-            = new SqrtTransform(nums, 0, nums.length);
-  
-        // Start the task
-        forkJoinPool.invoke(task);
-        System.out.println("A portion of the transformed sequence"
-                           + " (to four decimal places): ");
-        for (int i = 0; i < 9; i++) {
-            System.out.printf("%.4f ", nums[i]);
-        }
-        System.out.println();
+        System.out.println("Main method execution finished");
     }
 }
-  
 ```
 
 ## Output :
 ```
-A portion of the original sequence
-0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 
-A portion of the transformed sequence (to four decimal places): 
-0.0000 1.0000 1.4142 1.7321 2.0000 2.2361 2.4495 2.6458 2.8284 
+Splitting workLoad : 123
+Splitting workLoad : 62
+Splitting workLoad : 61
+Splitting workLoad : 31
+Splitting workLoad : 31
+Doing workLoad myself: 16
+Doing workLoad myself: 15
+Splitting workLoad : 30
+Doing workLoad myself: 15
+Doing workLoad myself: 15
+Doing workLoad myself: 16
+Splitting workLoad : 31
+Doing workLoad myself: 15
+Doing workLoad myself: 15
+Doing workLoad myself: 16
+Main method execution finished
 ```
 
 # References :
