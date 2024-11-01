@@ -27,56 +27,49 @@ With the work-stealing algorithm, threads that run out of tasks to process can s
 
 ## RecursiveTask
 ```java
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveTask;
-    
-class SumTask extends RecursiveTask<Long> {
-    final int seqThreshold = 500;
-    int[] data;
-    int start, end;
-  
-    SumTask(int[] data, int start, int end)
-    {
-        this.data = data;
-        this.start = start;
-        this.end = end;
+
+class MyRecursiveTask extends RecursiveTask<Integer> {
+    private int workLoad = 0;
+    public MyRecursiveTask(int workLoad) {
+        this.workLoad = workLoad;
     }
-  
-    @Override
-    protected Long compute()
-    {
-        long sum = 0;
-        if ((end - start) < seqThreshold) {
-            for (int i = start; i < end; i++)
-                sum += data[i];
+
+    protected Integer compute() {
+        // if work is above threshold, break tasks up into smaller tasks
+        if (this.workLoad > 16) {
+            System.out.println("Splitting workLoad : " + this.workLoad);
+            int workload1 = this.workLoad / 2;
+            int workload2 = this.workLoad - workload1;
+            MyRecursiveTask subtask1 = new MyRecursiveTask(workload1);
+            MyRecursiveTask subtask2 = new MyRecursiveTask(workload2);
+            subtask1.fork();
+            subtask2.fork();
+
+            return subtask1.join() + subtask2.join();
+        } else {
+            System.out.println("Doing workLoad myself: " + this.workLoad);
+            return workLoad;
         }
-        else {
-            int middle = (start + end) / 2;
-  
-            SumTask subtaskA = new SumTask(data, start, middle);
-            SumTask subtaskB = new SumTask(data, middle, end);
-  
-            subtaskA.fork();
-            subtaskB.fork();
-  
-            sum += subtaskA.join() + subtaskB.join();
-        }
-        return sum;
     }
 }
 
 public class Main {
-    public static void main(String[] args)
-    {
-        ForkJoinPool forkJoinPool = new ForkJoinPool();
-  
-        int[] nums = new int[4000];
-        for (int i = 0; i < nums.length; i++) {
-            nums[i] = i;
+    public static void main(String[] args) {
+        ForkJoinPool forkJoinPool = new ForkJoinPool(4);
+        MyRecursiveTask myRecursiveTask = new MyRecursiveTask(123);
+        // int result = forkJoinPool.invoke(myRecursiveTask);
+        ForkJoinTask<Integer> forkJoinTask = forkJoinPool.submit(myRecursiveTask);
+        try {
+            int result = forkJoinTask.get();
+            System.out.println("Result :" + result);
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
         }
-        SumTask task = new SumTask(nums, 0, nums.length);
-        long summation = forkJoinPool.invoke(task);
-        System.out.println("Summation " + summation);
+        System.out.println("Main method execution finished");
     }
 }
 ```
